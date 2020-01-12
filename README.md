@@ -6,5 +6,6 @@ This little project consists of a library that allows reading the D0/IEC62056-21
 Test Setup
 --------
 * RasPi 2
-* IR Reader (https://shop.weidmann-elektronik.de/index.php?page=product&info=24)
 * .Net Core 3.1
+* IR Reader (https://shop.weidmann-elektronik.de/index.php?page=product&info=24)
+* Logarex LK13BD Energy Meter
