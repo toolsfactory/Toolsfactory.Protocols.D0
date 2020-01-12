@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Tiveria.Home.D0.SampleApp": {
+      "commandName": "Project",
+      "commandLineArgs": "-serial COM3 -delay 300",
+      "environmentVariables": {
+        "environment": "Development"
+      }
+    }
+  }
+}
