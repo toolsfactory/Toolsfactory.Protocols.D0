@@ -32,7 +32,7 @@ namespace Tiveria.Home.D0.SampleApp
             _hostApplicationLifetime = hostApplicationLifetime;
             _logger = loggerFactory.CreateLogger<DaemonService>();
             _logManager = new LoggingExtensionsLogManager(loggerFactory);
-            _hexLogger = new Tiveria.Common.Logging.HexDumpLogger(new LoggingExtensionsLogger(_logger));
+            _hexLogger = new HexDumpLogger(new LoggingExtensionsLogger(_logger));
         }
 
         public override void Dispose()
@@ -48,15 +48,15 @@ namespace Tiveria.Home.D0.SampleApp
             stoppingToken.Register(() =>
                 _logger.LogDebug("DeamonService stop request received."));
 
-            await Task.Delay(1000, stoppingToken);
+            await Task.Delay(1000, stoppingToken).ConfigureAwait(false);
             _logger.LogInformation($"Delay configured: {_options.Value.DelaySec} sec");
     
             if (!TestTransportAndPort(_options.Value.SerialPort))
                 _hostApplicationLifetime.StopApplication();
             else
-                await RunLoopAsync(stoppingToken);
+                await RunLoopAsync(stoppingToken).ConfigureAwait(false);
 
-            await Task.Delay(1000);
+            await Task.Delay(1000).ConfigureAwait(false);
             _logger.LogDebug($"DaemonService is finished.");
         }
 
@@ -71,7 +71,7 @@ namespace Tiveria.Home.D0.SampleApp
                     _logger.LogInformation($"Beginning with loop {counter++}");
                     _transport.Open();
                     var parser = CreateParser(stoppingToken);
-                    var ok = await parser.ReadAndParseAsync();
+                    var ok = await parser.ReadAndParseAsync().ConfigureAwait(false);
                     _transport.Close();
                     Thread.Sleep(5 * 60 * 1000);
                 }
@@ -114,42 +114,6 @@ namespace Tiveria.Home.D0.SampleApp
             }
         }
 
-
-        private async Task RunAsync()
-        {
-            if (TestTransportAndPort(_options.Value.SerialPort))
-            {
-                Int64 counter = 0;
-
-                var parser = new D0SimpleStreamParser(_logManager, _hexLogger, _transport, _token, false);
-                parser.VendorMessageEvent += Parser_VendorMessageEvent;
-                parser.ObisDataEvent += Parser_ObisDataEvent;
-                _logger.LogInformation("Starting reading and parsing loop ...");
-                while (true)
-                {
-                    try
-                    {
-                        _logger.LogInformation($"Beginning with loop {counter++}");
-                        _transport.Open();
-                        var ok = await parser.ReadAndParseAsync().ConfigureAwait(false);
-                        _transport.Close();
-                        Thread.Sleep(5 * 60 * 1000);
-                    }
-                    catch (Exception e)
-                    {
-                        _hexLogger.Flush();
-                        _logger.LogError("Exception in read loop", e);
-                        Thread.Sleep(5000);
-                    }
-                    finally
-                    {
-                        if (_transport.IsOpen)
-                            _transport.Close();
-                    }
-                }
-            }
-        }
-
         private void Parser_ObisDataEvent(object sender, ObisDataEventArgs e)
         {
             _logger.LogInformation($"Obis Data - Code: {e.Code} - Value: {e.Value} - Unit: {e.Unit}");
@@ -167,26 +131,26 @@ namespace Tiveria.Home.D0.SampleApp
         {
             if (double.TryParse(value, System.Globalization.NumberStyles.Float, CultureInfo.InvariantCulture, out var val))
             {
-                SendAsync("http://192.168.2.150:8080/rest/items/Strom_Verbrauch_Total/state", value);
-                SendAsync("http://192.168.2.150:8080/rest/items/Strom_Verbrauch_lastupdate/state", DateTime.Now.ToString("s"));
+                await SendAsync("http://192.168.2.150:8080/rest/items/Strom_Verbrauch_Total/state", value).ConfigureAwait(false);
+                await SendAsync("http://192.168.2.150:8080/rest/items/Strom_Verbrauch_lastupdate/state", DateTime.Now.ToString("s", CultureInfo.InvariantCulture)).ConfigureAwait(false);
                 if (_lastValue > -1 && _lastValue <= val)
                 {
                     var period = (((val - _lastValue) * 1000).ToString(CultureInfo.InvariantCulture));
                     _logger.LogInformation($"Calculating Period: ({val} - {_lastValue}) * 1000 = {period}");
-                    SendAsync("http://192.168.2.150:8080/rest/items/Strom_Verbrauch_Period/state", period);
+                    await SendAsync("http://192.168.2.150:8080/rest/items/Strom_Verbrauch_Period/state", period).ConfigureAwait(false);
                 }
                 _lastValue = val;
             }
         }
 
-        private async void SendAsync(string endpoint, string value)
+        private async Task SendAsync(string endpoint, string value)
         {
             try
             {
                 _logger.LogInformation($"Sending '{value}' to Endpoint '{endpoint}'");
                 using var client = new System.Net.Http.HttpClient();
                 using var content = new StringContent(value);
-                await client.PutAsync(endpoint, content).ConfigureAwait(false);
+                _ = await client.PutAsync(endpoint, content).ConfigureAwait(false);
             }
             catch (Exception e)
             {

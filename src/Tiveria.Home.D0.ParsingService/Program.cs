@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Extensions;
 using System.IO;
+using System.Globalization;
 
 namespace Tiveria.Home.D0.SampleApp
 {
@@ -14,9 +15,10 @@ namespace Tiveria.Home.D0.SampleApp
     {
         static async Task Main(string[] args)
         {
-            await BuildHost(args).RunConsoleAsync();
+            await BuildHost(args).RunConsoleAsync().ConfigureAwait(false);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Zeichenfolgen in Großbuchstaben normalisieren", Justification = "<Ausstehend>")]
         static IHostBuilder BuildHost(string[] args)
         {
             return new HostBuilder()
@@ -31,7 +33,7 @@ namespace Tiveria.Home.D0.SampleApp
                     config.SetBasePath(Directory.GetCurrentDirectory())
                         .AddEnvironmentVariables()
                         .AddJsonFile("appsettings.json", true)
-                        .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName.ToLower()}.json", true)
+                        .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName.ToLower(CultureInfo.InvariantCulture)}.json", true)
                         .AddCommandLine(args);
                 })
                 .ConfigureServices((hostContext, services) =>

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Tiveria.Common.Builders;
 
 namespace Tiveria.Home.D0.Messages
 {
     public class MessageGenerator
     {
-        private static readonly Common.ByteArrayBuilder _buffer = new Common.ByteArrayBuilder();
+        private static readonly ByteArrayBuilder _buffer = new ByteArrayBuilder();
         public static byte[] GenerateRequestMessage(string deviceAddr="")
         {
             _buffer.Clear();
