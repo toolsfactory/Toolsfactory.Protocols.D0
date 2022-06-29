@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Tiveria.Common.Logging;
 using Tiveria.Common.Extensions;
 
-namespace Tiveria.Home.D0
+namespace Toolsfactory.Protocols.D0
 {
     /// <summary>
     /// Simple IEC62056-21 Parser.
@@ -75,7 +75,7 @@ namespace Tiveria.Home.D0
             }
         }
 
-        public async Task<bool> ReadVendorMessageAsync()
+        private async Task<bool> ReadVendorMessageAsync()
         {
             var vendor = new StringBuilder();
             var identification = new StringBuilder();
@@ -169,7 +169,7 @@ namespace Tiveria.Home.D0
             var counter = 0;
             while (!_token.IsCancellationRequested && (counter < Constants.AckMessage.Length))
             {
-                var data = await _reader.ReadByteAsync();
+                var data = await _reader.ReadByteAsync(1000);
                 _hexDump.DumpByte(HexDumpMode.BytesIn, data);
                 if (data != Constants.AckMessage[counter++])
                 {
@@ -184,7 +184,7 @@ namespace Tiveria.Home.D0
             var counter = 0;
             while (!_token.IsCancellationRequested && (counter < Constants.SignOnMessage.Length))
             {
-                var data = await _reader.ReadByteAsync();
+                var data = await _reader.ReadByteAsync(1000);
                 _hexDump.DumpByte(HexDumpMode.BytesIn, data);
                 if (data != Constants.SignOnMessage[counter++])
                 {
@@ -206,7 +206,7 @@ namespace Tiveria.Home.D0
 
             while (!_token.IsCancellationRequested && (state != ParseState.STOPPARSING))
             {
-                var data = await _reader.ReadByteAsync();
+                var data = await _reader.ReadByteAsync(5000);
                 _hexDump.DumpByte(HexDumpMode.BytesIn, data);
 
                 switch (state)

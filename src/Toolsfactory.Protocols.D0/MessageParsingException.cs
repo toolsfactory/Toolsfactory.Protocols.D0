@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Tiveria.Home.D0
+namespace Toolsfactory.Protocols.D0
 {
     public partial class D0SimpleStreamParser
     {

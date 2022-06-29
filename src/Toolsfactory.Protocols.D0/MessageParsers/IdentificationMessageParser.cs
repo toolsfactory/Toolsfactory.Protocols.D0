@@ -3,7 +3,7 @@ using System.Text;
 using Tiveria.Common.Logging;
 using Tiveria.Common.Extensions;
 
-namespace Tiveria.Home.D0
+namespace Toolsfactory.Protocols.D0
 {
     internal enum VendorMessageParseState
     {

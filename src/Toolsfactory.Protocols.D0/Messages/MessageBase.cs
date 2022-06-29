@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Tiveria.Common.Builders;
 
-namespace Tiveria.Home.D0.Messages
+namespace Toolsfactory.Protocols.D0.Messages
 {
     public class MessageGenerator
     {

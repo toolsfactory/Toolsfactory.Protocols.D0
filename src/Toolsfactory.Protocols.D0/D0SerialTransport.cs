@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Tiveria.Common.Logging;
 
-namespace Tiveria.Home.D0
+namespace Toolsfactory.Protocols.D0
 {
     public class D0SerialTransport : ID0Transport
     {
@@ -53,7 +53,7 @@ namespace Tiveria.Home.D0
             if (_port == null || !_port.IsOpen)
                 throw new InvalidOperationException("Port not initialized and opened");
             var buffer = new byte[1];
-            var cnt = await _port.BaseStream.ReadAsync(buffer, 0, 1, _CTS.Token);
+            var cnt = await _port.ReadAsync(buffer, 0, 1, _CTS.Token, timeoutms);
             return buffer[0];
         }
 
