@@ -2,7 +2,8 @@
 using System.IO.Ports;
 using System.Threading;
 using System.Threading.Tasks;
-using Tiveria.Common.Logging;
+using Microsoft.Extensions.Logging;
+using Tiveria.Common;
 
 namespace Toolsfactory.Protocols.D0
 {
@@ -10,30 +11,30 @@ namespace Toolsfactory.Protocols.D0
     {
         private CancellationTokenSource _CTS = new CancellationTokenSource();
         private SerialPort _port = null;
-        private readonly ILogger _logger = null;
+        private readonly ILogger<D0SerialTransport> _logger = null;
 
         public bool IsOpen => _port == null ? false : _port.IsOpen;
         public string PortName { get; private set; }
-        public D0SerialTransport(ILogManager logManager, string portName)
+        public D0SerialTransport(ILogger<D0SerialTransport> logger, string portName)
         {
-            if (logManager == null)
-                throw new ArgumentNullException(nameof(logManager));
-            _logger = logManager.GetLogger(nameof(D0SerialTransport));
+            Ensure.That(logger, nameof(logger)).IsNotNull();
+            Ensure.That(portName, nameof(portName)).IsNotNullOrEmpty();
+            _logger = logger;
             PortName = portName;
         }
 
         public void Open()
         {
-            _logger.Info($"Opening serial port {PortName} with 300 Baud and 7E1");
+            _logger.LogInformation($"Opening serial port {PortName} with 300 Baud and 7E1");
             _port = new SerialPort(PortName, 300, Parity.Even, 7, StopBits.One);
             _port.Open();
-            _logger.Info("Serial port successfully openened");
+            _logger.LogInformation("Serial port successfully openened");
         }
 
         public void Close()
         {
             _port?.Close();
-            _logger.Info("Serial port closed");
+            _logger.LogInformation("Serial port closed");
 
         }
         public void Cancel()

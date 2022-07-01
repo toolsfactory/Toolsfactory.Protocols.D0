@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
-using Tiveria.Common.Logging;
+using Microsoft.Extensions.Logging;
+using Tiveria.Common;
 using Tiveria.Common.Extensions;
 
 namespace Toolsfactory.Protocols.D0
@@ -23,11 +24,10 @@ namespace Toolsfactory.Protocols.D0
         public char BaudrateCharacter { get; private set; } = '0';
         public int ExpectedReactionTimeMS { get; private set; } = 200;
 
-        public IdentificationMessageParser(ILogManager logManager)
+        public IdentificationMessageParser(ILogger<IdentificationMessageParser> logger)
         {
-            if (logManager == null)
-                throw new ArgumentNullException(nameof(logManager));
-            this._logger = logManager.GetLogger(nameof(IdentificationMessageParser));
+            Ensure.That(logger, nameof(logger)).IsNotNull();
+            _logger = logger;
         }
 
         public bool Parse(byte[] input)

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Tiveria.Common.Logging;
 using Tiveria.Common.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Toolsfactory.Protocols.D0
 {
@@ -17,7 +18,7 @@ namespace Toolsfactory.Protocols.D0
         private readonly IHexDumpLogger _hexDump;
         private readonly ID0Transport _reader;
         private readonly CancellationToken _token;
-        private readonly ILogger _logger;
+        private readonly ILogger<D0SimpleStreamParser> _logger;
         private readonly bool _initialSync;
 
         public event EventHandler<VendorMessageEventArgs> VendorMessageEvent;
@@ -33,13 +34,13 @@ namespace Toolsfactory.Protocols.D0
         public IReadOnlyDictionary<string, ObisData> ObisItems { get { return _obisItems; } }
 
 
-        public D0SimpleStreamParser(ILogManager logManager, IHexDumpLogger hexDump, ID0Transport reader, CancellationToken token, bool initialSync = false)
+        public D0SimpleStreamParser(ILogger<D0SimpleStreamParser> logger, IHexDumpLogger hexDump, ID0Transport reader, CancellationToken token, bool initialSync = false)
         {
             _initialSync = initialSync;
             _hexDump = hexDump;
             _reader = reader;
             _token = token;
-            _logger = logManager.GetLogger(nameof(D0SimpleStreamParser));
+            _logger = logger;
             InitializeFields();
         }
 
